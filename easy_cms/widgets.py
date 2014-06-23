@@ -7,7 +7,8 @@ def content(context, name):
     from easy_cms.models import Content
     try:
         site = Site.objects.get_current()
-        obj = Content.objects.get(name=name, site=site)
+        obj = Content.objects.prefetch_related('children')\
+            .get(name=name, site=site)
         return {'content': obj}, obj.template_name
     except Content.DoesNotExist:
         return {}, None
