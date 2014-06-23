@@ -28,7 +28,7 @@ class Content(TranslatableModel):
     description = models.CharField(max_length=500, null=True, blank=True)
     url = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(upload_to='contents', null=True, blank=True)
-    parent = models.ForeignKey('cms.Content', null=True, blank=True,
+    parent = models.ForeignKey('easy_cms.Content', null=True, blank=True,
                                related_name='children')
     created_at = models.DateTimeField(auto_now_add=True)
     template_name = models.CharField(max_length=50, null=True, blank=True)

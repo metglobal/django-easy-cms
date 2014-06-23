@@ -23,7 +23,7 @@ def widget(context, widget_name, template_name=None, **kwargs):
 
 
 def placeholder(context, name):
-    from gezi.apps.cms.models import Placeholder
+    from easy_cms.models import Placeholder
     from django.core.urlresolvers import resolve
     site = Site.objects.get_current()
     try:
