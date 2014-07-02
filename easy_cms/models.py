@@ -2,6 +2,7 @@ from jsonfield import JSONField
 from hvad.models import TranslatableModel, TranslatedFields
 
 from django.db import models
+from django.contrib.sites.models import Site
 
 
 class Placeholder(models.Model):
@@ -45,3 +46,15 @@ class Content(TranslatableModel):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.parent:
+            try:
+                self.site
+            except Site.DoesNotExist:
+                self.site = self.parent.site
+        for child in self.children.all():
+            if child.site != self.site:
+                child.site = self.site
+                child.save()
+        super(Content, self).save(*args, **kwargs)
