@@ -2,7 +2,7 @@ from easy_cms import widget
 
 
 @widget
-def content(context, name):
+def content(context, name, **kwargs):
     from django.contrib.sites.models import Site
     from easy_cms.models import Content
     try:
