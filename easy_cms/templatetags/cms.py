@@ -1,6 +1,7 @@
 import logging
 
 from django import template
+from django.core.cache import cache
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
 
@@ -12,6 +13,13 @@ register = template.Library()
 
 
 def widget(context, widget_name, template_name=None, **kwargs):
+    language_code = context['request'].LANGUAGE_CODE
+    caching = kwargs.get('caching')
+    if caching:
+        key = caching['key'] + '-' + language_code
+        cached = cache.get(key)
+        if cached:
+            return cached
     f = registry.get(widget_name)
     if not f:
         logger.warn('Widget "%s" not found' % widget_name)
@@ -19,7 +27,10 @@ def widget(context, widget_name, template_name=None, **kwargs):
     context_data, _template_name = f(context, **kwargs)
     if not template_name:
         template_name = 'cms/widgets/%s.html' % (_template_name or widget_name)
-    return render_to_string(template_name, context_data)
+    rendered = render_to_string(template_name, context_data)
+    if caching:
+        cache.set(key, rendered, caching['expire'])
+    return rendered
 
 
 def placeholder(context, name):
