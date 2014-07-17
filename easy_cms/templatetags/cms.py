@@ -16,7 +16,7 @@ def widget(context, widget_name, template_name=None, **kwargs):
     language_code = context['request'].LANGUAGE_CODE
     caching = kwargs.get('caching')
     if caching:
-        key = caching['key'] + '-' + language_code
+        key = kwargs.get('caching_key') or caching['key'] + '-' + language_code
         cached = cache.get(key)
         if cached:
             return cached
@@ -29,7 +29,8 @@ def widget(context, widget_name, template_name=None, **kwargs):
         template_name = 'cms/widgets/%s.html' % (_template_name or widget_name)
     rendered = render_to_string(template_name, context_data)
     if caching:
-        cache.set(key, rendered, caching['expire'])
+        cache.set(key, rendered,
+                  kwargs.get('caching_expire') or caching['expire'])
     return rendered
 
 
