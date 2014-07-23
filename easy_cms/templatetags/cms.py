@@ -1,4 +1,5 @@
 import logging
+import hashlib
 
 from django import template
 from django.core.cache import cache
@@ -12,26 +13,49 @@ logger = logging.getLogger(__name__)
 register = template.Library()
 
 
-def widget(context, widget_name, template_name=None, **kwargs):
-    language_code = context['request'].LANGUAGE_CODE
-    caching = kwargs.get('caching')
-    if caching:
-        key = kwargs.get('caching_key') or caching['key'] + '-' + language_code
-        cached = cache.get(key)
-        if cached:
-            return cached
+def widget(context, widget_name, template_name=None, cache_enabled=False,
+           cache_timeout=None, cache_key=None, cache_key_prefix=None,
+           vary_on_headers=None, vary_on_cookies=None, **kwargs):
     f = registry.get(widget_name)
     if not f:
         logger.warn('Widget "%s" not found' % widget_name)
         return ''
-    context_data, _template_name = f(context, **kwargs)
-    if not template_name:
-        template_name = 'cms/widgets/%s.html' % (_template_name or widget_name)
-    rendered = render_to_string(template_name, context_data)
-    if caching:
-        cache.set(key, rendered,
-                  kwargs.get('caching_expire') or caching['expire'])
-    return rendered
+    request = context.get('request')
+    assert request, """You need to add 'django.core.context_processors.request'
+    in your TEMPLATE_CONTEXT_PROCESSORS settings.
+    """
+    output = None
+    cache_key = None
+    if cache_enabled:
+        md5 = hashlib.md5()
+        md5.update(cache_key_prefix or '')
+        md5.update(cache_key or widget_name)
+        md5.update(template_name or '')
+        if vary_on_headers:
+            for header in vary_on_headers:
+                header_value = request.META.get(header)
+                if header_value:
+                    md5.update(header_value)
+        if vary_on_cookies:
+            for cookie in vary_on_cookies:
+                cookie_value = request.COOKIES.get(cookie)
+                if cookie_value:
+                    md5.update(cookie_value)
+        cache_key = md5.hexdigest()
+        output = cache.get(cache_key)
+        if output:
+            logger.debug('"%s" is got from cache' % widget_name)
+
+    if not output:
+        context_data, _template_name = f(context, **kwargs)
+        if not template_name:
+            template_name = 'cms/widgets/%s.html' % (_template_name or
+                                                     widget_name)
+        output = render_to_string(template_name, context_data)
+        if cache_enabled:
+            logger.debug('"%s" is put into cache' % widget_name)
+            cache.set(cache_key, output, cache_timeout)
+    return output
 
 
 def placeholder(context, name):
@@ -52,9 +76,26 @@ def placeholder(context, name):
 
     widgets = []
     for c in container.widget_config:
-        params = c.get('params', {})
+        widget_name = c['name']
         template_name = c.get('template_name')
-        widgets.append(widget(context, c['name'], template_name, **params))
+        cache_enabled = c.get('cache_enabled')
+        cache_timeout = c.get('cache_timeout')
+        cache_key = c.get('cache_key')
+        cache_key_prefix = c.get('cache_key_prefix')
+        vary_on_headers = c.get('vary_on_headers')
+        vary_on_cookies = c.get('vary_on_cookies')
+        params = c.get('params', {})
+        output = widget(context,
+                        widget_name,
+                        template_name=template_name,
+                        cache_enabled=cache_enabled,
+                        cache_timeout=cache_timeout,
+                        cache_key=cache_key,
+                        cache_key_prefix=cache_key_prefix,
+                        vary_on_headers=vary_on_headers,
+                        vary_on_cookies=vary_on_cookies,
+                        **params)
+        widgets.append(output)
 
     placeholder_template_name = container.template_name
     if not placeholder_template_name:
