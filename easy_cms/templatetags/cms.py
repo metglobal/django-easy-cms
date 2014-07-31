@@ -25,7 +25,6 @@ def widget(context, widget_name, template_name=None, cache_enabled=False,
     in your TEMPLATE_CONTEXT_PROCESSORS settings.
     """
     output = None
-    cache_key = None
     if cache_enabled:
         md5 = hashlib.md5()
         md5.update(cache_key_prefix or '')
