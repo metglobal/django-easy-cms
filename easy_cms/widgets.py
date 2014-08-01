@@ -12,3 +12,8 @@ def content(context, name, **kwargs):
         return {'content': obj}, obj.template_name
     except Content.DoesNotExist:
         return {}, None
+
+
+@widget
+def template_widget(context, template_name=None, **kwargs):
+    return kwargs, template_name
