@@ -15,7 +15,9 @@ register = template.Library()
 
 def widget(context, widget_name, template_name=None, cache_enabled=False,
            cache_timeout=None, cache_key=None, cache_key_prefix=None,
-           vary_on_headers=None, vary_on_cookies=None, **kwargs):
+           vary_on_headers=None, vary_on_cookies=None, active=True, **kwargs):
+    if not active:
+        return ''
     f = registry.get(widget_name)
     if not f:
         logger.warn('Widget "%s" not found' % widget_name)
