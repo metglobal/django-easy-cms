@@ -12,26 +12,30 @@ logger = logging.getLogger(__name__)
 register = template.Library()
 
 
-def widget(context, widget_name, template_name=None, **kwargs):
-    language_code = context['request'].LANGUAGE_CODE
-    caching = kwargs.get('caching')
-    if caching:
-        key = kwargs.get('caching_key') or caching['key'] + '-' + language_code
-        cached = cache.get(key)
-        if cached:
-            return cached
-    f = registry.get(widget_name)
-    if not f:
-        logger.warn('Widget "%s" not found' % widget_name)
-        return ''
-    context_data, _template_name = f(context, **kwargs)
-    if not template_name:
-        template_name = 'cms/widgets/%s.html' % (_template_name or widget_name)
-    rendered = render_to_string(template_name, context_data)
-    if caching:
-        cache.set(key, rendered,
-                  kwargs.get('caching_expire') or caching['expire'])
-    return rendered
+def widget(context, widget_name, template_name=None, active=True, **kwargs):
+    if active:
+        language_code = context['request'].LANGUAGE_CODE
+        caching = kwargs.get('caching')
+        if caching:
+            key = (kwargs.get('caching_key')
+                   or caching['key']) + '-' + language_code
+            cached = cache.get(key)
+            if cached:
+                return cached
+        f = registry.get(widget_name)
+        if not f:
+            logger.warn('Widget "%s" not found' % widget_name)
+            return ''
+        context_data, _template_name = f(context, **kwargs)
+        if not template_name:
+            template_name = 'cms/widgets/%s.html' % (
+                _template_name or widget_name)
+        rendered = render_to_string(template_name, context_data)
+        if caching:
+            cache.set(key, rendered,
+                      kwargs.get('caching_expire') or caching['expire'])
+        return rendered
+    return ''
 
 
 def placeholder(context, name):
