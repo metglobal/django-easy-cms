@@ -52,6 +52,7 @@ def widget(context, widget_name, template_name=None, cache_enabled=False,
         if not template_name:
             template_name = 'cms/widgets/%s.html' % (_template_name or
                                                      widget_name)
+        context_data.update({'request': request})
         output = render_to_string(template_name, context_data)
         if cache_enabled:
             logger.debug('"%s" is put into cache' % widget_name)
