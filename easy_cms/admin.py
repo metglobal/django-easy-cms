@@ -1,6 +1,9 @@
 from django.contrib import admin
+from django.conf import settings
+from django.db import models
 
 from hvad.admin import TranslatableAdmin, TranslatableStackedInline
+from django_markdown.widgets import MarkdownWidget
 
 from easy_cms.models import Placeholder, Content
 
@@ -21,6 +24,10 @@ class ContentAdmin(TranslatableAdmin):
     list_display = ('id', 'site', 'name', 'description', 'created_at')
     list_filter = ('site',)
     inlines = [ContentInline]
+    if getattr(settings, 'CMS_MARKDOWN_ENABLED', False):
+        formfield_overrides = {
+            models.TextField: {'widget': MarkdownWidget},
+        }
 
 
 admin.site.register(Placeholder, PlaceholderAdmin)
