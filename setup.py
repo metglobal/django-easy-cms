@@ -20,7 +20,7 @@ setup(
         'django>=1.5',
         'jsonfield==0.9.20',
         'django-hvad==0.4.1',
-        'django-markdown==0.6.1',
+        'django-markdown==0.7.0',
     ],
     dependency_links=[
         'https://github.com/KristianOellegaard/django-hvad.git#egg=django-hvad'
