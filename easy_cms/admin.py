@@ -20,7 +20,7 @@ class ContentInline(TranslatableStackedInline):
 
 
 class ContentAdmin(TranslatableAdmin):
-    list_display = ('id', 'site', 'name', 'description', 'created_at')
+    list_display = ('id', 'site', 'name', 'created_at')
     list_filter = ('site',)
     inlines = [ContentInline]
     if getattr(settings, 'CMS_MARKDOWN_ENABLED', False):
