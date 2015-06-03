@@ -15,7 +15,8 @@ register = template.Library()
 
 def widget(context, widget_name, template_name=None, cache_enabled=False,
            cache_timeout=None, cache_key=None, cache_key_prefix=None,
-           vary_on_headers=None, vary_on_cookies=None, active=True, **kwargs):
+           vary_on_headers=None, vary_on_cookies=None, active=True,
+           vary_on_sessions=None, **kwargs):
     if not active:
         return ''
     f = registry.get(widget_name)
@@ -42,6 +43,12 @@ def widget(context, widget_name, template_name=None, cache_enabled=False,
                 cookie_value = request.COOKIES.get(cookie)
                 if cookie_value:
                     md5.update(cookie_value)
+        if vary_on_sessions:
+            if hasattr(request, 'session'):
+                for session in vary_on_sessions:
+                    session_value = request.session.get(session)
+                    if session_value:
+                        md5.update(session_value)
         cache_key = md5.hexdigest()
         output = cache.get(cache_key)
         if output:
@@ -86,6 +93,7 @@ def placeholder(context, name):
         cache_key_prefix = c.get('cache_key_prefix')
         vary_on_headers = c.get('vary_on_headers')
         vary_on_cookies = c.get('vary_on_cookies')
+        vary_on_sessions = c.get('vary_on_sessions')
         params = c.get('params', {})
         output = widget(context,
                         widget_name,
@@ -96,6 +104,7 @@ def placeholder(context, name):
                         cache_key_prefix=cache_key_prefix,
                         vary_on_headers=vary_on_headers,
                         vary_on_cookies=vary_on_cookies,
+                        vary_on_sessions=vary_on_sessions,
                         **params)
         widgets.append(output)
 
