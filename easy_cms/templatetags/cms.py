@@ -44,10 +44,11 @@ def widget(context, widget_name, template_name=None, cache_enabled=False,
                 if cookie_value:
                     md5.update(cookie_value)
         if vary_on_sessions:
-            for session in vary_on_sessions:
-                session_value = request.session.get(session)
-                if session_value:
-                    md5.update(session_value)
+            if hasattr(request, 'session'):
+                for session in vary_on_sessions:
+                    session_value = request.session.get(session)
+                    if session_value:
+                        md5.update(session_value)
         cache_key = md5.hexdigest()
         output = cache.get(cache_key)
         if output:
