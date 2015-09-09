@@ -26,7 +26,6 @@ class Placeholder(models.Model):
 class Content(TranslatableModel):
 
     name = models.SlugField(max_length=50, unique=True)
-    image = models.ImageField(upload_to='contents', null=True, blank=True)
     parent = models.ForeignKey('easy_cms.Content', null=True, blank=True,
                                related_name='children')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -38,7 +37,8 @@ class Content(TranslatableModel):
         tagline=models.CharField(max_length=255, null=True, blank=True),
         content=models.TextField(null=True, blank=True),
         description=models.CharField(max_length=500, null=True, blank=True),
-        url=models.CharField(max_length=255, null=True, blank=True)
+        url=models.CharField(max_length=255, null=True, blank=True),
+        image=models.ImageField(upload_to='contents', null=True, blank=True),
     )
 
     # Foreign Keys
