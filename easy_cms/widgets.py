@@ -8,7 +8,7 @@ def content(context, name, **kwargs):
     try:
         site = Site.objects.get_current()
         obj = Content.objects.prefetch_related('children')\
-            .get(name=name, site=site)
+            .get(name=name, sites=site)
         return {'content': obj}, obj.template_name
     except Content.DoesNotExist:
         return {}, None

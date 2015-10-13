@@ -72,7 +72,7 @@ def placeholder(context, name):
     from django.core.urlresolvers import resolve
     site = Site.objects.get_current()
     try:
-        container = Placeholder.objects.get(name=name, site=site)
+        container = Placeholder.objects.get(name=name, sites=site)
         if container.view_name:
             request = context['request']
             match = resolve(request.path)
