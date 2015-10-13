@@ -49,13 +49,13 @@ class StaticPagesFallbackMiddleware(object):
         try:
             staticpage = get_object_or_404(Content.objects.language(lang),
                                            url__exact=url,
-                                           site__id__exact=site_id)
+                                           sites__id__exact=site_id)
         except Http404:
             if not url.endswith('/') and settings.APPEND_SLASH:
                 url += '/'
                 staticpage = get_object_or_404(Content.objects.language(lang),
                                                url__exact=url,
-                                               site__id__exact=site_id)
+                                               sites__id__exact=site_id)
                 return HttpResponsePermanentRedirect('%s/' % request.path)
             else:
                 raise
