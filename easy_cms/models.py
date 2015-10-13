@@ -14,7 +14,7 @@ class Placeholder(models.Model):
     template_name = models.CharField(max_length=50, null=True, blank=True)
 
     # Foreign Keys
-    site = models.ForeignKey('sites.Site')
+    sites = models.ManyToManyField('sites.Site')
 
     class Meta:
         unique_together = ('name', 'view_name')
@@ -42,7 +42,7 @@ class Content(TranslatableModel):
     )
 
     # Foreign Keys
-    site = models.ForeignKey('sites.Site')
+    sites = models.ManyToManyField('sites.Site')
 
     def __unicode__(self):
         return self.name
