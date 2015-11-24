@@ -23,7 +23,8 @@ setup(
         'django-markdown==0.7.0',
     ],
     dependency_links=[
-        'https://github.com/KristianOellegaard/django-hvad.git#egg=django-hvad'
+        'https://github.com/KristianOellegaard/django-hvad.git#egg=django-hvad',  # noqa
+        'https://github.com/douglasmiranda/django-wysiwyg-redactor.git#egg=redactor',  # noqa
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
