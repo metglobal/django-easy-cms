@@ -1,5 +1,6 @@
 from jsonfield import JSONField
 from hvad.models import TranslatableModel, TranslatedFields
+from redactor.fields import RedactorField
 
 from django.db import models
 from django.contrib.sites.models import Site
@@ -36,7 +37,7 @@ class Content(TranslatableModel):
     translations = TranslatedFields(
         title=models.CharField(max_length=255, null=True, blank=True),
         tagline=models.CharField(max_length=255, null=True, blank=True),
-        content=models.TextField(null=True, blank=True),
+        content=RedactorField(null=True, blank=True, upload_to='easy_cms'),
         description=models.CharField(max_length=500, null=True, blank=True),
         url=models.CharField(max_length=255, null=True, blank=True)
     )
