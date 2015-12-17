@@ -17,7 +17,7 @@ class Placeholder(models.Model):
     site = models.ForeignKey('sites.Site')
 
     class Meta:
-        unique_together = ('name', 'site')
+        unique_together = ('name', 'view_name', 'site')
 
     def __unicode__(self):
         return self.name
