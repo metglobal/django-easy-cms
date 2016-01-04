@@ -30,6 +30,8 @@ class Content(TranslatableModel):
                                related_name='children')
     created_at = models.DateTimeField(auto_now_add=True)
     template_name = models.CharField(max_length=50, null=True, blank=True)
+    sort_order = models.IntegerField(default=0)
+    show_nav = models.BooleanField(default=False)
 
     # Translations
     translations = TranslatedFields(
@@ -46,6 +48,9 @@ class Content(TranslatableModel):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        ordering = ('sort_order',)
 
     def save(self, *args, **kwargs):
         if self.parent:
