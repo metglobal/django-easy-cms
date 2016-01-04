@@ -8,8 +8,12 @@ from easy_cms.models import Placeholder, Content
 
 
 class PlaceholderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'site', 'name', 'view_name')
-    list_filter = ('view_name', 'site')
+    list_display = ('id', 'name', 'get_sites', 'view_name')
+    list_filter = ('view_name', 'sites__domain')
+    filter_horizontal = ('sites',)
+
+    def get_sites(self, obj):
+        return ', '.join([s.domain for s in obj.sites.all()])
 
 
 class ContentInline(TranslatableStackedInline):
@@ -20,8 +24,9 @@ class ContentInline(TranslatableStackedInline):
 
 
 class ContentAdmin(TranslatableAdmin):
-    list_display = ('id', 'site', 'name', 'created_at')
-    list_filter = ('site',)
+    list_display = ('id', 'name', 'get_sites', 'created_at')
+    list_filter = ('sites__domain',)
+    filter_horizontal = ('sites',)
     inlines = [ContentInline]
     if getattr(settings, 'CMS_MARKDOWN_ENABLED', False):
         try:
@@ -31,6 +36,9 @@ class ContentAdmin(TranslatableAdmin):
             }
         except ImportError:
             pass
+
+    def get_sites(self, obj):
+        return ', '.join([s.domain for s in obj.sites.all()])
 
 
 admin.site.register(Placeholder, PlaceholderAdmin)
