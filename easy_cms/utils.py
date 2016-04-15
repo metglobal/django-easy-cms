@@ -6,7 +6,7 @@ def generic_autodiscover(module_name):
     Usage:
         generic_autodiscover('commands') <-- find all commands.py and load 'em
     """
-    from django.utils.importlib import import_module
+    from importlib import import_module
     from django.core.exceptions import ImproperlyConfigured
     import imp
     import sys
